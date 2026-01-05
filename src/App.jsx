@@ -4,7 +4,8 @@ import MovieRow from './components/MovieRow'
 import MovieDetailsModal from './components/MovieDetailsModal'
 import { Container, Grid, Title, Paper, Stack, Button, Center, Loader, Text, TextInput } from '@mantine/core'
 import { IconSearch } from '@tabler/icons-react'
-import { getPopular, getTopRated, getTrending } from './api/tmdb'
+import { useNavigate } from 'react-router-dom'
+import { getPopular, getTopRated, getTrending, searchMovies } from './api/tmdb'
 
 export default function App() {
   const TMDB_KEY = import.meta.env.VITE_TMDB_KEY
@@ -30,11 +31,46 @@ export default function App() {
   const [trending, setTrending] = useState([])
   const [error, setError] = useState(null)
   const [search, setSearch] = useState('')
+  const [suggestions, setSuggestions] = useState([])
+  const [loadingSuggestions, setLoadingSuggestions] = useState(false)
+  const [showSuggestions, setShowSuggestions] = useState(false)
+  const navigate = useNavigate()
+
+  function handleSearchSubmit(query) {
+    if (!query || !query.trim()) return
+    navigate(`/search?q=${encodeURIComponent(query.trim())}`)
+  }
   const [detailsId, setDetailsId] = useState(null)
   const [detailsOpen, setDetailsOpen] = useState(false)
 
   useEffect(() => { localStorage.setItem('movie_lists', JSON.stringify(lists)) }, [lists])
   useEffect(() => { localStorage.setItem('movie_ratings', JSON.stringify(ratings)) }, [ratings])
+
+  // Debounced autocomplete for toolbar search
+  useEffect(() => {
+    if (!search || search.trim().length < 2) {
+      setSuggestions([])
+      setLoadingSuggestions(false)
+      return
+    }
+
+    setLoadingSuggestions(true)
+    const t = setTimeout(async () => {
+      try {
+        const json = await searchMovies(search.trim(), 1)
+        const mapped = mapResults(json.results || []).slice(0, 8)
+        setSuggestions(mapped)
+        setShowSuggestions(true)
+      } catch (err) {
+        console.warn('Autocomplete search failed', err)
+        setSuggestions([])
+      } finally {
+        setLoadingSuggestions(false)
+      }
+    }, 300)
+
+    return () => clearTimeout(t)
+  }, [search])
 
   const addList = (list) => setLists(prev => [...prev, { ...list, id: Date.now() }])
   const addToList = (listId, movieId) => setLists(prev => prev.map(l => l.id === listId ? { ...l, movies: Array.from(new Set([...(l.movies||[]), movieId])) } : l))
@@ -158,14 +194,33 @@ export default function App() {
             <div style={{display:'flex',alignItems:'center',gap:8}}>
               {error && <Text color="red">Error loading from TMDB: {error}</Text>}
             </div>
-            <div>
-              <TextInput
-                className="toolbar-search"
-                placeholder="Search movies..."
-                value={search}
-                onChange={(e) => setSearch(e.currentTarget.value)}
-                icon={<IconSearch size={16} />}
-              />
+            <div style={{position:'relative'}}>
+              <div style={{position:'relative'}}>
+                <TextInput
+                  className="toolbar-search"
+                  placeholder="Search movies..."
+                  value={search}
+                  onChange={(e) => setSearch(e.currentTarget.value)}
+                  onKeyDown={(e) => { if (e.key === 'Enter') handleSearchSubmit(search) }}
+                  onFocus={() => { if (suggestions.length) setShowSuggestions(true) }}
+                  onBlur={() => setTimeout(() => setShowSuggestions(false), 150)}
+                  icon={<IconSearch size={16} />}
+                />
+
+                {showSuggestions && suggestions.length > 0 && (
+                  <div className="toolbar-autocomplete" role="listbox">
+                    {suggestions.map(s => (
+                      <div key={s.id} className="toolbar-autocomplete-item" onMouseDown={() => { handleSearchSubmit(s.title); setShowSuggestions(false) }}>
+                        <img src={s.poster} alt="" className="toolbar-autocomplete-poster" />
+                        <div className="toolbar-autocomplete-meta">
+                          <div className="toolbar-autocomplete-title">{s.title}</div>
+                          <div className="toolbar-autocomplete-year">{s.year}</div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
           </div>
 

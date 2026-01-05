@@ -1,7 +1,7 @@
 ﻿import React from 'react'
 import MovieCard from './MovieCard'
 
-export default function MovieList({ movies, ratings, onRate, onAddToList, lists, onOpenDetails }) {
+export default function MovieList({ movies, ratings = {}, onRate, onAddToList, lists, onOpenDetails }) {
   return (
     <div className="movie-list">
       {movies.map(m => (

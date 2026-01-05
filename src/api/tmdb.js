@@ -31,3 +31,11 @@ export async function getTrending(period = 'day', opts = {}) {
   const url = `https://api.themoviedb.org/3/trending/movie/${period}?api_key=${key}`
   return requestUrl(url, opts)
 }
+
+export async function searchMovies(query, page = 1, opts = {}) {
+  const key = ensureKey()
+  const url = `https://api.themoviedb.org/3/search/movie?api_key=${key}&language=en-US&query=${encodeURIComponent(query)}&page=${page}`
+  // search results are volatile; default to a short TTL (5 minutes) unless caller overrides
+  const localOpts = { ttl: opts.ttl ?? DEFAULT_TTL, force: !!opts.force }
+  return requestUrl(url, localOpts)
+}

@@ -10,9 +10,9 @@
 	--card-elevation: rgba(2,6,23,0.6);
 
 	/* card sizing variables */
-	--card-width: 380px;
-	--card-height: 500px;
-	--poster-height: 320px;
+	--card-width: 300px;
+	--card-height: 380px;
+	--poster-height: 240px;
 
 	/* spacing variables */
 	--card-gap: 40px;
@@ -26,7 +26,6 @@ body{font-family:Inter,Segoe UI,Arial,Helvetica,sans-serif;margin:0;padding:var(
 main{display:flex;gap:1rem;padding:1rem}
 .left{flex:2}
 .right{flex:1;min-width:260px}
-/* toolbar styling to increase visibility of control areas */
 .toolbar{
 	background:linear-gradient(180deg, rgba(79,70,229,0.06), rgba(11,18,32,0.02));
 	padding:14px 16px;
@@ -35,6 +34,8 @@ main{display:flex;gap:1rem;padding:1rem}
 	margin-bottom:14px;
 	box-shadow:0 8px 30px rgba(2,6,23,0.5);
 	backdrop-filter: blur(4px);
+	position:relative; /* ensure autocomplete dropdown can layer above rows */
+	z-index:80;
 }
 .toolbar .mantine-Title-root{color:var(--text)}
 .toolbar .toolbar-note{color:var(--muted);font-size:0.95rem}
@@ -165,3 +166,24 @@ main{display:flex;gap:1rem;padding:1rem}
 .rating .on{color:gold}
 .list-creator input,.list-creator textarea{width:100%;margin-bottom:8px;padding:6px}
 .movie-list-card{background:var(--card-bg);padding:8px;border-radius:6px;margin-bottom:8px}
+
+/* toolbar autocomplete dropdown */
+.toolbar-autocomplete{
+    position:absolute;
+    top:calc(100% + 8px);
+    left:0;
+    right:0;
+    background: linear-gradient(180deg, rgba(11,18,32,0.96), rgba(2,6,23,0.98));
+    border:1px solid rgba(255,255,255,0.04);
+    border-radius:8px;
+    box-shadow:0 12px 40px rgba(2,6,23,0.7);
+    z-index:9999; /* high z-index so dropdown overlays rows/cards */
+    max-height:320px;
+    overflow:auto;
+}
+.toolbar-autocomplete-item{display:flex;gap:8px;align-items:center;padding:8px;cursor:pointer;border-bottom:1px solid rgba(255,255,255,0.02)}
+.toolbar-autocomplete-item:hover{background:rgba(79,70,229,0.04)}
+.toolbar-autocomplete-poster{width:42px;height:62px;object-fit:cover;border-radius:6px;flex:0 0 42px}
+.toolbar-autocomplete-meta{display:flex;flex-direction:column}
+.toolbar-autocomplete-title{font-weight:600;color:var(--text)}
+.toolbar-autocomplete-year{font-size:0.9rem;color:var(--muted)}
