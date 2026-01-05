@@ -1,9 +1,13 @@
-﻿import React from 'react'
-import { Card, Image } from '@mantine/core'
+﻿import React, { useState } from 'react'
+import { Modal,Card, Image } from '@mantine/core'
+import { useDisclosure } from '@mantine/hooks'
 
 export default function MovieCard({ movie }) {
+
+
   return (
-    <Card className="movie-card" shadow="sm" padding="xs" radius="md" withBorder>
+    
+    <Card className="movie-card" shadow="sm" padding="xs" radius="md" withBorder >
       <Card.Section>
         <div className="movie-card__poster">
           <Image src={movie.poster} alt={movie.title} fit="cover" />
@@ -19,5 +23,6 @@ export default function MovieCard({ movie }) {
       </div>
       */}
     </Card>
+    
   )
 }

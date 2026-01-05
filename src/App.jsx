@@ -2,7 +2,8 @@
 import MovieList from './components/MovieList'
 import MovieRow from './components/MovieRow'
 import MovieDetailsModal from './components/MovieDetailsModal'
-import { Container, Grid, Title, Paper, Stack, Button, Center, Loader, Text } from '@mantine/core'
+import { Container, Grid, Title, Paper, Stack, Button, Center, Loader, Text, TextInput } from '@mantine/core'
+import { IconSearch } from '@tabler/icons-react'
 import { getPopular, getTopRated, getTrending } from './api/tmdb'
 
 export default function App() {
@@ -18,10 +19,17 @@ export default function App() {
   const [page, setPage] = useState(1)
   const [loading, setLoading] = useState(false)
   const [hasMore, setHasMore] = useState(true)
+  const [topRatedPage, setTopRatedPage] = useState(1)
+  const [trendingPage, setTrendingPage] = useState(1)
+  const [loadingTopRated, setLoadingTopRated] = useState(false)
+  const [loadingTrending, setLoadingTrending] = useState(false)
+  const [topRatedHasMore, setTopRatedHasMore] = useState(false)
+  const [trendingHasMore, setTrendingHasMore] = useState(false)
   const [popularTotalPages, setPopularTotalPages] = useState(1)
   const [topRated, setTopRated] = useState([])
   const [trending, setTrending] = useState([])
   const [error, setError] = useState(null)
+  const [search, setSearch] = useState('')
   const [detailsId, setDetailsId] = useState(null)
   const [detailsOpen, setDetailsOpen] = useState(false)
 
@@ -76,20 +84,32 @@ export default function App() {
   }
 
   async function loadTopRated(p = 1) {
+    setLoadingTopRated(true)
     try {
       const json = await getTopRated(p)
-      setTopRated(mapResults(json.results))
+      const mapped = mapResults(json.results)
+      setTopRated(prev => p === 1 ? mapped : [...prev, ...mapped])
+      setTopRatedPage(p)
+      setTopRatedHasMore(p < (json.total_pages || 1))
     } catch (err) {
       console.warn('Failed loading top rated', err)
+    } finally {
+      setLoadingTopRated(false)
     }
   }
 
   async function loadTrending(period = 'day') {
+    setLoadingTrending(true)
     try {
-      const json = await getTrending(period)
+      const json = await getTrending(period, /* page */ 1)
+      // TMDB trending endpoint may not support page param depending on wrapper; assume returning single page
       setTrending(mapResults(json.results))
+      setTrendingPage(1)
+      setTrendingHasMore(false)
     } catch (err) {
       console.warn('Failed loading trending', err)
+    } finally {
+      setLoadingTrending(false)
     }
   }
 
@@ -110,18 +130,47 @@ export default function App() {
     }
   }
 
+  async function handleLoadMoreTopRated() {
+    if (!topRatedHasMore || loadingTopRated) return
+    try {
+      await loadTopRated(topRatedPage + 1)
+    } catch (err) {
+      console.warn('Load more top rated failed', err)
+    }
+  }
+
+  async function handleLoadMoreTrending() {
+    if (!trendingHasMore || loadingTrending) return
+    try {
+      // If trending pagination supported, implement similarly. For now, no-op or future support.
+      await loadTrending('day')
+    } catch (err) {
+      console.warn('Load more trending failed', err)
+    }
+  }
+
   return (
     <Container size="xl" py="md">
       <Stack spacing="sm">
-        <Title order={1}>moveez</Title>
+        <Title order={1} style={{color:"var(--accent)",margin:"2% 3 %" }}>moveez</Title>
         <Paper padding="md">
-          <div className="toolbar">
-            <Title order={2} size="h3">All Movies</Title>
-            {error && <Text color="red">Error loading from TMDB: {error}</Text>}
+          <div className="toolbar" style={{display:'flex',alignItems:'center',justifyContent:'space-between'}}>
+            <div style={{display:'flex',alignItems:'center',gap:8}}>
+              {error && <Text color="red">Error loading from TMDB: {error}</Text>}
+            </div>
+            <div>
+              <TextInput
+                className="toolbar-search"
+                placeholder="Search movies..."
+                value={search}
+                onChange={(e) => setSearch(e.currentTarget.value)}
+                icon={<IconSearch size={16} />}
+              />
+            </div>
           </div>
 
-          <MovieRow title="Trending" movies={trending} onOpenDetails={(id) => { setDetailsId(id); setDetailsOpen(true) }} />
-          <MovieRow title="Top Rated" movies={topRated} onOpenDetails={(id) => { setDetailsId(id); setDetailsOpen(true) }} />
+          <MovieRow title="Trending" movies={trending} onOpenDetails={(id) => { setDetailsId(id); setDetailsOpen(true) }} onLoadMore={handleLoadMoreTrending} loading={loadingTrending} hasMore={trendingHasMore} />
+          <MovieRow title="Top Rated" movies={topRated} onOpenDetails={(id) => { setDetailsId(id); setDetailsOpen(true) }} onLoadMore={handleLoadMoreTopRated} loading={loadingTopRated} hasMore={topRatedHasMore} />
           <MovieRow id="row-popular" title="Popular" movies={movies} onOpenDetails={(id) => { setDetailsId(id); setDetailsOpen(true) }} onLoadMore={handleLoadMoreAndScroll} loading={loading} hasMore={hasMore} />
 
           <div className="toolbar" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -130,9 +179,6 @@ export default function App() {
             ) : (
               <>
                 <Text className="toolbar-note">Showing {movies.length} movies — page {page}/{popularTotalPages}</Text>
-                <div>
-                  {loading ? <Loader /> : hasMore ? <Button onClick={() => loadPage(page + 1)} disabled={loading}>Load more</Button> : <Text color="dimmed">No more movies</Text>}
-                </div>
               </>
             )}
           </div>

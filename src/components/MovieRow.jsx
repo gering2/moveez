@@ -6,15 +6,36 @@ export default function MovieRow({ id, title, movies, onOpenDetails, onLoadMore,
   const rowRef = useRef(null)
   const [canScrollNext, setCanScrollNext] = useState(false)
   const [canScrollPrev, setCanScrollPrev] = useState(false)
+  const [arrowTop, setArrowTop] = useState(null)
+  const [arrowVisible, setArrowVisible] = useState(false)
 
   const updateScrollState = useCallback(() => {
     const el = rowRef.current
     if (!el) return
-    const tolerance = 8
-    const canNext = el.scrollWidth > el.clientWidth && el.scrollLeft + el.clientWidth < el.scrollWidth - tolerance
-    const canPrev = el.scrollLeft > tolerance
+    // compute remaining scroll and use a small epsilon to avoid off-by-one issues
+    const epsilon = 2
+    const remaining = Math.max(0, el.scrollWidth - el.clientWidth - el.scrollLeft)
+    const canNext = remaining > epsilon
+    const canPrev = el.scrollLeft > epsilon
+    // debug: log metrics so we can inspect why arrows hide (safe guard)
+    if (typeof process !== 'undefined' && process.env && process.env.NODE_ENV !== 'production') {
+      // eslint-disable-next-line no-console
+      console.debug('MovieRow.updateScrollState', { id, scrollWidth: el.scrollWidth, clientWidth: el.clientWidth, scrollLeft: el.scrollLeft, remaining, canNext, canPrev })
+    }
+
     setCanScrollNext(canNext)
     setCanScrollPrev(canPrev)
+
+    // compute arrow vertical position and visibility for fixed-edge arrows
+    try {
+      const rect = el.getBoundingClientRect()
+      const mid = Math.round(rect.top + rect.height / 2)
+      const visible = rect.bottom > 0 && rect.top < (window.innerHeight || document.documentElement.clientHeight)
+      setArrowTop(mid)
+      setArrowVisible(visible)
+    } catch (e) {
+      setArrowVisible(false)
+    }
   }, [])
 
   useEffect(() => {
@@ -23,10 +44,19 @@ export default function MovieRow({ id, title, movies, onOpenDetails, onLoadMore,
     if (!el) return
     const onScroll = () => updateScrollState()
     window.addEventListener('resize', updateScrollState)
+    window.addEventListener('scroll', updateScrollState, { passive: true })
     el.addEventListener('scroll', onScroll)
+    // observe size/child changes (e.g., when more cards are appended)
+    let ro = null
+    if (window.ResizeObserver) {
+      ro = new ResizeObserver(() => updateScrollState())
+      ro.observe(el)
+    }
     return () => {
       window.removeEventListener('resize', updateScrollState)
+      window.removeEventListener('scroll', updateScrollState)
       el.removeEventListener('scroll', onScroll)
+      if (ro) ro.disconnect()
     }
   }, [updateScrollState, movies.length])
 
@@ -34,15 +64,12 @@ export default function MovieRow({ id, title, movies, onOpenDetails, onLoadMore,
     const el = rowRef.current
     if (!el) return
     el.scrollBy({ left: el.clientWidth, behavior: 'smooth' })
-    // ensure state updates after smooth scroll completes
-    setTimeout(updateScrollState, 400)
   }
 
   function scrollPrev() {
     const el = rowRef.current
     if (!el) return
     el.scrollBy({ left: -el.clientWidth, behavior: 'smooth' })
-    setTimeout(updateScrollState, 400)
   }
 
   return (
@@ -66,21 +93,25 @@ export default function MovieRow({ id, title, movies, onOpenDetails, onLoadMore,
           </div>
         )}
 
-        {/* scroll arrow shown when there's overflow to the right */}
-        {canScrollPrev && (
-          <div className="row-scroll-btn left">
-            <ActionIcon size="xl" variant="light" onClick={scrollPrev} aria-label="Scroll previous">
+        {/* arrows: always render (disabled when scrolling isn't possible) */}
+        <>
+          <div
+            className="row-scroll-btn left"
+            style={arrowVisible && arrowTop != null ? { position: 'fixed', left: 12, top: arrowTop, transform: 'translateY(-50%)' } : { display: 'none' }}
+          >
+            <ActionIcon size="xl" variant="light" onClick={scrollPrev} aria-label="Scroll previous" disabled={!canScrollPrev}>
               <IconChevronLeft size={22} />
             </ActionIcon>
           </div>
-        )}
-        {canScrollNext && (
-          <div className="row-scroll-btn right">
-            <ActionIcon size="xl" variant="light" onClick={scrollNext} aria-label="Scroll next">
+          <div
+            className="row-scroll-btn right"
+            style={arrowVisible && arrowTop != null ? { position: 'fixed', right: 12, top: arrowTop, transform: 'translateY(-50%)' } : { display: 'none' }}
+          >
+            <ActionIcon size="xl" variant="light" onClick={scrollNext} aria-label="Scroll next" disabled={!canScrollNext}>
               <IconChevronRight size={32} />
             </ActionIcon>
           </div>
-        )}
+        </>
       </div>
     </div>
   )

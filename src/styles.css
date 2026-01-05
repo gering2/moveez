@@ -10,13 +10,13 @@
 	--card-elevation: rgba(2,6,23,0.6);
 
 	/* card sizing variables */
-	--card-width: 460px;
-	--card-height: 720px;
-	--poster-height: 560px;
+	--card-width: 380px;
+	--card-height: 500px;
+	--poster-height: 320px;
 
 	/* spacing variables */
 	--card-gap: 40px;
-	--row-gap: 28px;
+	--row-gap: 20px;
 
 	/* outer spacing */
 	--outer-padding: 24px;
@@ -38,6 +38,14 @@ main{display:flex;gap:1rem;padding:1rem}
 }
 .toolbar .mantine-Title-root{color:var(--text)}
 .toolbar .toolbar-note{color:var(--muted);font-size:0.95rem}
+
+/* search box styling in toolbar */
+.toolbar-search{display:inline-block}
+.toolbar-search .mantine-Input-input,
+.toolbar-search input{width:260px;padding:10px 12px;border-radius:10px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.04);color:var(--text);transition:box-shadow 160ms ease,border-color 120ms ease}
+.toolbar-search .mantine-Input-input:focus,
+.toolbar-search input:focus{outline:none;box-shadow:0 8px 30px rgba(79,70,229,0.08);border-color:var(--accent)}
+.toolbar-search .mantine-Input-icon svg{color:var(--muted)}
 /* grid: use fixed column width so cards are uniform */
 .movie-list{display:grid;grid-template-columns:repeat(auto-fill,var(--card-width));justify-content:center;gap:var(--card-gap)}
 
@@ -62,6 +70,7 @@ main{display:flex;gap:1rem;padding:1rem}
 	height:var(--card-height);
 	box-sizing:border-box;
 	border-radius:10px;
+	cursor:pointer;
 }
 .movie-card:hover{transform:translateY(-8px);box-shadow:0 30px 70px rgba(2,6,23,0.85);border-color:rgba(255,255,255,0.09)}
 
@@ -78,7 +87,7 @@ main{display:flex;gap:1rem;padding:1rem}
 
 .movie-card__title{
 	font-weight:700;
-	font-size:1.4rem;
+	font-size:1.2rem;
 	line-height:1.08;
 	overflow:hidden;
 	text-overflow:ellipsis;
@@ -111,30 +120,30 @@ main{display:flex;gap:1rem;padding:1rem}
 
 /* horizontal movie row */
 .movie-row{
-	position:relative;
-	display:flex;
+    position:relative;
+    display:flex;
     width: 100vw;
-    
-	gap:var(--row-gap);
-	overflow-x:auto;
-	padding-bottom:6px;
-	padding-top:6px;
-	/* Firefox scrollbar */
-	scrollbar-color: var(--accent) rgba(11,18,32,0.12);
-	scrollbar-width: thin;
+    gap:var(--row-gap);
+    overflow-x:auto;
+    padding-bottom:6px;
+    padding-top:6px;
+	margin: 20px;
+    /* Firefox scrollbar */
+    scrollbar-color: var(--accent) rgba(11,18,32,0.12);
+    scrollbar-width: thin;
 }
-.movie-row::-webkit-scrollbar{height:12px}
+.movie-row::-webkit-scrollbar{height:12px;}
 .movie-row::-webkit-scrollbar-track{background:rgba(255,255,255,0.02);border-radius:8px}
 .movie-row::-webkit-scrollbar-thumb{background:var(--accent);border-radius:8px;border:2px solid rgba(0,0,0,0.12)}
 .movie-row-item{flex:0 0 var(--card-width)}
 
 /* load-more item styling */
 .load-more-item{height:var(--card-height);display:flex;align-items:center;justify-content:center;border-radius:10px;background:linear-gradient(180deg,rgba(255,255,255,0.01),transparent);border:1px dashed rgba(255,255,255,0.03)}
-.load-more-item .mantine-ActionIcon-root{width:72px;height:72px;border-radius:12px}
+.load-more-item .mantine-ActionIcon-root{width:72px;height:72px;border-radius:12px; cursor:pointer}
 
 /* arrow to scroll next set */
 .row-scroll-btn{position:absolute;top:45%;transform:translateY(-50%);z-index:30;}
-.row-scroll-btn.left{left:100%}
+.row-scroll-btn.left{left:12px}
 .row-scroll-btn.right{right:12px}
 .row-scroll-btn .mantine-ActionIcon-root{
 	background:#ffffff; /* solid white fill */
@@ -145,6 +154,7 @@ main{display:flex;gap:1rem;padding:1rem}
      cursor:pointer;
 }
 .row-scroll-btn .mantine-ActionIcon-root:hover{background:#ffffff;transform:translateY(-1px)}
+
 
 /* poster wrapper for consistent image sizing */
 .movie-poster{width:100%;height:var(--poster-height);overflow:hidden;border-radius:8px;flex:0 0 var(--poster-height);margin-bottom:0}
