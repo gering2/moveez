@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { Modal, Title, Text, Image, Group, Badge, Loader, Stack } from '@mantine/core'
+import { useModalState } from '../contexts/ModalContext'
 import { getMovieDetails } from '../api/tmdb'
 
 export default function MovieDetailsModal({ id, opened, onClose }) {
@@ -37,8 +38,17 @@ export default function MovieDetailsModal({ id, opened, onClose }) {
     return () => { cancelled = true }
   }, [opened, id])
 
+  // update global modal state so other components can react
+  const { setModalOpen } = useModalState()
+  useEffect(() => {
+    if (opened) setModalOpen(true)
+    else setModalOpen(false)
+    return () => setModalOpen(false)
+  }, [opened, setModalOpen])
+
   
   return (
+    <div>
     <Modal
       opened={opened}
       onClose={onClose}
@@ -49,12 +59,12 @@ export default function MovieDetailsModal({ id, opened, onClose }) {
       transitionProps={{ transition: 'fade', duration: 200 }}
       lockScroll={false}
       withinPortal={true}
-      closeOnClickOutside={true}
       closeButtonProps={{
         'aria-label': 'Close movie details',
-        style: { backgroundColor: 'white', cursor: 'pointer', width: '28px', height: '28px', padding: '6px', minWidth: '28px', minHeight: '28px'  }
+        style: { cursor: 'pointer', width: '28px', height: '28px', padding: '6px', minWidth: '28px', minHeight: '28px'  }
       }}
       overlayProps={{ opacity: 0.65, blur: 6 }}
+      classNames={{ modal: 'movie-modal', body: 'movie-modal-body', header: 'movie-modal-header' }}
       styles={{ modal: { border: '1px solid rgba(255,255,255,0.08)' } }}
     >
       {loading && <Loader />}
@@ -81,5 +91,6 @@ export default function MovieDetailsModal({ id, opened, onClose }) {
         </Stack>
       )}
     </Modal>
+    </div>
   )
 }

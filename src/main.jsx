@@ -2,6 +2,7 @@
 import { createRoot } from 'react-dom/client'
 import { MantineProvider } from '@mantine/core'
 import App from './App'
+import { ModalProvider } from './contexts/ModalContext'
 import { BrowserRouter, Routes, Route, useLocation, useParams, useNavigate } from 'react-router-dom'
 import MovieSearchResults from './components/MovieSearchResults'
 import MovieDetailsModal from './components/MovieDetailsModal'
@@ -59,7 +60,9 @@ root.render(
 		}}
 	>
 		<BrowserRouter>
-				<RouterWrapper />
+			<ModalProvider>
+					<RouterWrapper />
+			</ModalProvider>
 		</BrowserRouter>
 	</MantineProvider>
 )

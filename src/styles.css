@@ -76,6 +76,9 @@ main{display:flex;gap:1rem;padding:1rem}
 }
 .movie-card:hover{transform:translateY(-8px);box-shadow:0 30px 70px rgba(2,6,23,0.85);border-color:rgba(255,255,255,0.09)}
 
+/* disabled state while modal open */
+.movie-card.disabled{pointer-events:none;opacity:0.6}
+
 .movie-card__poster{
 	/* stretch poster to card edges (card has 12px padding) */
 	width:calc(100% + 24px);
@@ -202,3 +205,22 @@ main{display:flex;gap:1rem;padding:1rem}
 	max-width:calc(100% - 48px) !important;
 }
 /* removed close button override to allow Mantine closeButtonProps to control sizing */
+
+/* Explicit modal panel styling to ensure background color is applied */
+.movie-modal{
+	background-color: rgba(11,18,32,0.98) !important;
+	color: var(--text) !important;
+	box-shadow: 0 30px 80px rgba(2,6,23,0.9) !important;
+}
+
+/* Ensure header and body have opaque backgrounds too */
+.movie-modal-header{
+	background-color: rgba(11,18,32,0.98) !important;
+	color: var(--text) !important;
+	border-bottom: 1px solid rgba(255,255,255,0.03) !important;
+}
+.movie-modal-body{
+	background-color: rgba(11,18,32,0.98) !important;
+	color: var(--text) !important;
+	padding: 18px !important;
+}
