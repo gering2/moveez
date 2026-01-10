@@ -2,9 +2,9 @@
 import MovieList from './components/MovieList'
 import MovieRow from './components/MovieRow'
 import MovieDetailsModal from './components/MovieDetailsModal'
-import { Container, Grid, Title, Paper, Stack, Button, Center, Loader, Text, TextInput } from '@mantine/core'
+import { Container, Grid, Title, Paper, Stack, Button, Center, Loader, Text, TextInput, Group } from '@mantine/core'
 import { IconSearch } from '@tabler/icons-react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 import { getPopular, getTopRated, getTrending, searchMovies } from './api/tmdb'
 
 export default function App() {
@@ -35,13 +35,13 @@ export default function App() {
   const [loadingSuggestions, setLoadingSuggestions] = useState(false)
   const [showSuggestions, setShowSuggestions] = useState(false)
   const navigate = useNavigate()
+  const location = useLocation()
 
   function handleSearchSubmit(query) {
     if (!query || !query.trim()) return
     navigate(`/search?q=${encodeURIComponent(query.trim())}`)
   }
-  const [detailsId, setDetailsId] = useState(null)
-  const [detailsOpen, setDetailsOpen] = useState(false)
+  
 
   useEffect(() => { localStorage.setItem('movie_lists', JSON.stringify(lists)) }, [lists])
   useEffect(() => { localStorage.setItem('movie_ratings', JSON.stringify(ratings)) }, [ratings])
@@ -190,12 +190,12 @@ export default function App() {
       <Stack spacing="sm">
         <Title order={1} style={{color:"var(--accent)",margin:"2% 3 %" }}>moveez</Title>
         <Paper padding="md">
-          <div className="toolbar" style={{display:'flex',alignItems:'center',justifyContent:'space-between'}}>
-            <div style={{display:'flex',alignItems:'center',gap:8}}>
-              {error && <Text color="red">Error loading from TMDB: {error}</Text>}
-            </div>
-            <div style={{position:'relative'}}>
+          <div className="toolbar" style={{justifyContent: 'right', display:'flex'}}>
+            {error &&   <div style={{display:'flex',alignItems:'center',gap:8}}>
+              <Text color="red">Error loading from TMDB: {error}</Text>
+            </div>}
               <div style={{position:'relative'}}>
+              
                 <TextInput
                   className="toolbar-search"
                   placeholder="Search movies..."
@@ -204,7 +204,7 @@ export default function App() {
                   onKeyDown={(e) => { if (e.key === 'Enter') handleSearchSubmit(search) }}
                   onFocus={() => { if (suggestions.length) setShowSuggestions(true) }}
                   onBlur={() => setTimeout(() => setShowSuggestions(false), 150)}
-                  icon={<IconSearch size={16} />}
+                  rightSection={<IconSearch size={16} />}
                 />
 
                 {showSuggestions && suggestions.length > 0 && (
@@ -221,12 +221,12 @@ export default function App() {
                   </div>
                 )}
               </div>
-            </div>
+           
           </div>
 
-          <MovieRow title="Trending" movies={trending} onOpenDetails={(id) => { setDetailsId(id); setDetailsOpen(true) }} onLoadMore={handleLoadMoreTrending} loading={loadingTrending} hasMore={trendingHasMore} />
-          <MovieRow title="Top Rated" movies={topRated} onOpenDetails={(id) => { setDetailsId(id); setDetailsOpen(true) }} onLoadMore={handleLoadMoreTopRated} loading={loadingTopRated} hasMore={topRatedHasMore} />
-          <MovieRow id="row-popular" title="Popular" movies={movies} onOpenDetails={(id) => { setDetailsId(id); setDetailsOpen(true) }} onLoadMore={handleLoadMoreAndScroll} loading={loading} hasMore={hasMore} />
+          <MovieRow title="Trending" movies={trending} onOpenDetails={(id) => navigate(`/movie/${id}`, { state: { background: location } })} onLoadMore={handleLoadMoreTrending} loading={loadingTrending} hasMore={trendingHasMore} />
+          <MovieRow title="Top Rated" movies={topRated} onOpenDetails={(id) => navigate(`/movie/${id}`, { state: { background: location } })} onLoadMore={handleLoadMoreTopRated} loading={loadingTopRated} hasMore={topRatedHasMore} />
+          <MovieRow id="row-popular" title="Popular" movies={movies} onOpenDetails={(id) => navigate(`/movie/${id}`, { state: { background: location } })} onLoadMore={handleLoadMoreAndScroll} loading={loading} hasMore={hasMore} />
 
           <div className="toolbar" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
             {!TMDB_KEY ? (
@@ -238,7 +238,7 @@ export default function App() {
             )}
           </div>
 
-          <MovieDetailsModal id={detailsId} opened={detailsOpen} onClose={() => setDetailsOpen(false)} />
+          {/* Movie details handled via modal route in router */}
         </Paper>
       </Stack>
     </Container>

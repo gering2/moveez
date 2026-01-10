@@ -1,17 +1,18 @@
 import React, { useEffect, useState } from 'react'
-import { Modal, Title, Text, Image, Group, Badge, Loader, Stack } from '@mantine/core'
+import { useParams, useNavigate } from 'react-router-dom'
+import { Container, Title, Text, Image, Group, Badge, Loader, Stack, ActionIcon } from '@mantine/core'
+import { IconChevronLeft } from '@tabler/icons-react'
 import { getMovieDetails } from '../api/tmdb'
 
-export default function MovieDetailsModal({ id, opened, onClose }) {
+export default function MovieDetailsPage() {
+  const { id } = useParams()
+  const navigate = useNavigate()
   const [loading, setLoading] = useState(false)
   const [data, setData] = useState(null)
   const [error, setError] = useState(null)
 
   useEffect(() => {
-    // debug
-    // eslint-disable-next-line no-console
-    console.log('MovieDetailsModal effect', { opened, id })
-    if (!opened || !id) return
+    if (!id) return
     const key = import.meta.env.VITE_TMDB_KEY
     if (!key) {
       setError('TMDB key not set')
@@ -23,11 +24,7 @@ export default function MovieDetailsModal({ id, opened, onClose }) {
       setError(null)
       try {
         const json = await getMovieDetails(id)
-        if (!cancelled) {
-          setData(json)
-          // eslint-disable-next-line no-console
-          console.log('MovieDetailsModal got data', { id, title: json.title })
-        }
+        if (!cancelled) setData(json)
       } catch (err) {
         if (!cancelled) setError(String(err))
       } finally {
@@ -35,28 +32,13 @@ export default function MovieDetailsModal({ id, opened, onClose }) {
       }
     })()
     return () => { cancelled = true }
-  }, [opened, id])
+  }, [id])
 
-  
   return (
-    <Modal
-      opened={opened}
-      onClose={onClose}
-      size="lg"
-      title={data ? data.title : 'Loading...'}
-      zIndex={99999}
-      centered
-      transitionProps={{ transition: 'fade', duration: 200 }}
-      lockScroll={false}
-      withinPortal={true}
-      closeOnClickOutside={true}
-      closeButtonProps={{
-        'aria-label': 'Close movie details',
-        style: { backgroundColor: 'white', cursor: 'pointer', width: '28px', height: '28px', padding: '6px', minWidth: '28px', minHeight: '28px'  }
-      }}
-      overlayProps={{ opacity: 0.65, blur: 6 }}
-      styles={{ modal: { border: '1px solid rgba(255,255,255,0.08)' } }}
-    >
+    <Container size="xl" py="md">
+      <ActionIcon variant="light" size="lg" onClick={() => navigate(-1)} aria-label="Back">
+        <IconChevronLeft size={20} />
+      </ActionIcon>
       {loading && <Loader />}
       {error && <Text color="red">{error}</Text>}
       {data && (
@@ -80,6 +62,6 @@ export default function MovieDetailsModal({ id, opened, onClose }) {
           )}
         </Stack>
       )}
-    </Modal>
+    </Container>
   )
 }

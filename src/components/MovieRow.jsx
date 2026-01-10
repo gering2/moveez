@@ -78,7 +78,7 @@ export default function MovieRow({ id, title, movies, onOpenDetails, onLoadMore,
       <div id={id} ref={rowRef} className="movie-row">
         {movies.map(m => (
           <div key={m.id} className="movie-row-item">
-            <MovieCard movie={m} />
+            <MovieCard movie={m} onOpen={() => onOpenDetails && onOpenDetails(m.id)} />
           </div>
         ))}
 

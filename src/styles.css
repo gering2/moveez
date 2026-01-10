@@ -10,9 +10,9 @@
 	--card-elevation: rgba(2,6,23,0.6);
 
 	/* card sizing variables */
-	--card-width: 300px;
-	--card-height: 380px;
-	--poster-height: 240px;
+	--card-width: 240px;
+	--card-height: 430px;
+	--poster-height: 310px;
 
 	/* spacing variables */
 	--card-gap: 40px;
@@ -40,9 +40,10 @@ main{display:flex;gap:1rem;padding:1rem}
 .toolbar .mantine-Title-root{color:var(--text)}
 .toolbar .toolbar-note{color:var(--muted);font-size:0.95rem}
 
+
 /* search box styling in toolbar */
-.toolbar-search{display:inline-block}
-.toolbar-search .mantine-Input-input,
+.toolbar-search{}
+
 .toolbar-search input{width:260px;padding:10px 12px;border-radius:10px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.04);color:var(--text);transition:box-shadow 160ms ease,border-color 120ms ease}
 .toolbar-search .mantine-Input-input:focus,
 .toolbar-search input:focus{outline:none;box-shadow:0 8px 30px rgba(79,70,229,0.08);border-color:var(--accent)}
@@ -52,7 +53,7 @@ main{display:flex;gap:1rem;padding:1rem}
 
 /* backward compatibility helper */
 .movie-legacy-card{background:var(--card-bg);padding:8px;border-radius:6px;box-shadow:0 1px 3px rgba(0,0,0,0.08);display:flex;gap:8px}
-.movie-legacy-card img{width:80px;height:120px;object-fit:cover;border-radius:4px}
+.movie-legacy-card img{width:80px;height:120px;object-fit:contain;object-position:center;border-radius:4px;background:rgba(0,0,0,0.04)}
 
 /* styled Mantine Card for movie cards (centered) */
 /* Main movie card (BEM) - grid-based for predictable layout */
@@ -84,11 +85,11 @@ main{display:flex;gap:1rem;padding:1rem}
 	border-top-left-radius:8px;
 	border-top-right-radius:8px;
 }
-.movie-card__poster img{width:100%;height:100%;object-fit:cover;display:block}
+.movie-card__poster img{width:100%;height:100%;object-fit:cover;object-position:center;display:block}
 
 .movie-card__title{
 	font-weight:700;
-	font-size:1.2rem;
+	font-size:1.0rem;
 	line-height:1.08;
 	overflow:hidden;
 	text-overflow:ellipsis;
@@ -116,14 +117,16 @@ main{display:flex;gap:1rem;padding:1rem}
 	height:calc(1.05rem * 3);
 }
 
+/* overlay removed — hover overlay reverted */
+
 /* make footer height consistent so the year baseline lines up */
 .movie-card__footer{display:flex;flex-direction:column;align-items:center;padding-bottom:6px}
 
 /* horizontal movie row */
 .movie-row{
-    position:relative;
-    display:flex;
-    width: 100vw;
+	position:relative;
+	display:flex;
+	width: 100%;
     gap:var(--row-gap);
     overflow-x:auto;
     padding-bottom:6px;
@@ -159,7 +162,7 @@ main{display:flex;gap:1rem;padding:1rem}
 
 /* poster wrapper for consistent image sizing */
 .movie-poster{width:100%;height:var(--poster-height);overflow:hidden;border-radius:8px;flex:0 0 var(--poster-height);margin-bottom:0}
-.movie-poster img{width:100%;height:100%;object-fit:cover;display:block}
+.movie-poster img{width:100%;height:100%;object-fit:cover;object-position:center;display:block}
 
 .meta h3{margin:0 0 6px 0;font-size:1rem}
 .rating button{background:none;border:none;font-size:16px;cursor:pointer;padding:2px}
@@ -177,13 +180,25 @@ main{display:flex;gap:1rem;padding:1rem}
     border:1px solid rgba(255,255,255,0.04);
     border-radius:8px;
     box-shadow:0 12px 40px rgba(2,6,23,0.7);
-    z-index:9999; /* high z-index so dropdown overlays rows/cards */
+	z-index:900; /* keep below modal overlays */
     max-height:320px;
     overflow:auto;
 }
 .toolbar-autocomplete-item{display:flex;gap:8px;align-items:center;padding:8px;cursor:pointer;border-bottom:1px solid rgba(255,255,255,0.02)}
 .toolbar-autocomplete-item:hover{background:rgba(79,70,229,0.04)}
-.toolbar-autocomplete-poster{width:42px;height:62px;object-fit:cover;border-radius:6px;flex:0 0 42px}
+.toolbar-autocomplete-poster{width:42px;height:62px;object-fit:contain;object-position:center;border-radius:6px;flex:0 0 42px;background:rgba(0,0,0,0.04)}
 .toolbar-autocomplete-meta{display:flex;flex-direction:column}
 .toolbar-autocomplete-title{font-weight:600;color:var(--text)}
 .toolbar-autocomplete-year{font-size:0.9rem;color:var(--muted)}
+
+/* Force Mantine modal to behave as a centered popup and normalize close button size
+	 These are defensive overrides in case app CSS interferes with Mantine's defaults. */
+[role="dialog"]{
+	position:fixed !important;
+	top:50% !important;
+	left:50% !important;
+	transform:translate(-50%,-50%) !important;
+	z-index:200000 !important;
+	max-width:calc(100% - 48px) !important;
+}
+/* removed close button override to allow Mantine closeButtonProps to control sizing */
