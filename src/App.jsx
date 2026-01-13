@@ -188,7 +188,7 @@ export default function App() {
   return (
     <Container size="xl" py="md">
       <Stack spacing="sm">
-        <Title order={1} style={{color:"var(--accent)",margin:"2% 3 %" }}>moveez</Title>
+        <Title order={1} style={{color:"var(--accent)",margin:"2% 3%" }}>moveez</Title>
         <Paper padding="md">
           <div className="toolbar" style={{justifyContent: 'right', display:'flex'}}>
             {error &&   <div style={{display:'flex',alignItems:'center',gap:8}}>

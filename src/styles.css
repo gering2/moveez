@@ -194,33 +194,63 @@ main{display:flex;gap:1rem;padding:1rem}
 .toolbar-autocomplete-title{font-weight:600;color:var(--text)}
 .toolbar-autocomplete-year{font-size:0.9rem;color:var(--muted)}
 
-/* Force Mantine modal to behave as a centered popup and normalize close button size
-	 These are defensive overrides in case app CSS interferes with Mantine's defaults. */
+.mantine-Overlay-root,
+[data-mantine-overlay] {
+  outline: 3px solid rgba(255,0,0,0.8) !important;
+  background: rgba(0,0,0,0.35) !important;
+  pointer-events: auto !important;
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: 999999 !important;
+}
+
 [role="dialog"]{
-	position:fixed !important;
-	top:50% !important;
-	left:50% !important;
-	transform:translate(-50%,-50%) !important;
-	z-index:200000 !important;
-	max-width:calc(100% - 48px) !important;
+	position:fixed;
+	top:50% ;
+	left:50% ;
+	transform:translate(-50%,-50%) ;
+	z-index:200000 ;
+	max-width:calc(100% - 48px);
 }
 /* removed close button override to allow Mantine closeButtonProps to control sizing */
 
 /* Explicit modal panel styling to ensure background color is applied */
 .movie-modal{
-	background-color: rgba(11,18,32,0.98) !important;
-	color: var(--text) !important;
-	box-shadow: 0 30px 80px rgba(2,6,23,0.9) !important;
+	background-color: rgba(11,18,32,0.98) ;
+	color: var(--text);
+	box-shadow: 0 30px 80px rgba(2,6,23,0.9);
+		position:fixed;
+	top:50% ;
+	left:50% ;
+	transform:translate(-50%,-50%) ;
+	z-index:200000 ;
+	max-width:calc(100% - 48px);
 }
 
 /* Ensure header and body have opaque backgrounds too */
 .movie-modal-header{
-	background-color: rgba(11,18,32,0.98) !important;
-	color: var(--text) !important;
-	border-bottom: 1px solid rgba(255,255,255,0.03) !important;
+	background-color: rgba(11,18,32,0.98);
+	color: var(--text) ;
+	border-bottom: 1px solid rgba(255,255,255,0.03) ;
 }
 .movie-modal-body{
-	background-color: rgba(11,18,32,0.98) !important;
-	color: var(--text) !important;
-	padding: 18px !important;
+	background-color: rgba(11,18,32,0.98);
+	color: var(--text) ;
+	padding: 18px ;
 }
+
+/* Ensure Mantine overlay covers the viewport and accepts pointer events
+   so click-outside can be detected. Kept specific and minimal to avoid
+   interfering with other layout rules. */
+.mantine-Overlay-root,
+[data-mantine-overlay]{
+	position: fixed !important;
+	inset: 0 !important;
+	pointer-events: auto !important;
+	z-index: 199999 !important;
+}
+
+
+
+JSON (JavaScript Oobject Notation)
+	lightweight data format that uses javscript object syntax to represent data 

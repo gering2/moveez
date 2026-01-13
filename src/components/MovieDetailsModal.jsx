@@ -48,21 +48,23 @@ export default function MovieDetailsModal({ id, opened, onClose }) {
 
   
   return (
-    <div>
+
     <Modal
       opened={opened}
       onClose={onClose}
       size="lg"
-      title={data ? data.title : 'Loading...'}
-      zIndex={99999}
+      closeOnClickOutside={true}
+      closeOnEscape={true}
       centered
       transitionProps={{ transition: 'fade', duration: 200 }}
       lockScroll={false}
       withinPortal={true}
+     
       closeButtonProps={{
         'aria-label': 'Close movie details',
         style: { cursor: 'pointer', width: '28px', height: '28px', padding: '6px', minWidth: '28px', minHeight: '28px'  }
       }}
+      zIndex={99999}
       overlayProps={{ opacity: 0.65, blur: 6 }}
       classNames={{ modal: 'movie-modal', body: 'movie-modal-body', header: 'movie-modal-header' }}
       styles={{ modal: { border: '1px solid rgba(255,255,255,0.08)' } }}
@@ -70,27 +72,30 @@ export default function MovieDetailsModal({ id, opened, onClose }) {
       {loading && <Loader />}
       {error && <Text color="red">{error}</Text>}
       {data && (
-        <Stack spacing="sm">
+        <Stack spacing="md">
           <Group align="flex-start">
-            <Image src={data.poster_path ? `https://image.tmdb.org/t/p/w300${data.poster_path}` : 'https://via.placeholder.com/150x225?text=No+Image'} alt={data.title} width={150} />
-            <div>
-              <Title order={4}>{data.title} ({data.release_date ? new Date(data.release_date).getFullYear() : ''})</Title>
-              <Text size="sm" color="dimmed">Runtime: {data.runtime ? `${data.runtime} min` : 'N/A'}</Text>
-              <div style={{ marginTop: 8 }}>
-                {(data.genres||[]).map(g => <Badge key={g.id} mr={6}>{g.name}</Badge>)}
-              </div>
-              <Text mt="sm">{data.overview}</Text>
-            </div>
+            <Stack spacing="md">
+              <Image src={data.poster_path ? `https://image.tmdb.org/t/p/w300${data.poster_path}` : 'https://via.placeholder.com/150x225?text=No+Image'} alt={data.title} width={150} />
+              <Title  order={4} style={{marginTop: 5,marginBottom:0}}>{data.title} ({data.release_date ? new Date(data.release_date).getFullYear() : ''})</Title>
+            </Stack>
+
+            <Stack spacing="xs" style={{flex: 1}}>
+              <Text style={{margin:0,fontSize:12}}>Runtime: {data.runtime ? `${data.runtime} min` : 'N/A'}</Text>
+              <Group spacing={5} wrap="nowrap" style={{display: "flex", gap:5, marginTop: 8 }}>
+                {(data.genres||[]).map(g => <Badge style={{fontSize: 11, backgroundColor:"var(--accent)", padding: 7, borderRadius:25}} key={g.id} mr={6}>{g.name}</Badge>)}
+              </Group>
+              <Text mt="med">{data.overview}</Text>
+            </Stack>
           </Group>
           {data.credits && data.credits.cast && (
-            <div>
-              <Title order={5}>Top cast</Title>
-              <Text size="sm">{(data.credits.cast||[]).slice(0,6).map(c => c.name).join(', ')}</Text>
-            </div>
+            <Group style={{alignItems:"center",display:"flex", gap:5}} >
+              <Title style = {{whiteSpace: "nowrap"}}order={5}>Top cast:</Title>
+              <Text style={{fontSize:10}}>{(data.credits.cast||[]).slice(0,6).map(c => c.name).join(', ')}</Text>
+            </Group>
           )}
         </Stack>
       )}
     </Modal>
-    </div>
+
   )
 }
