@@ -7,6 +7,7 @@ import { BrowserRouter, Routes, Route, useLocation, useParams, useNavigate } fro
 import MovieSearchResults from './components/MovieSearchResults'
 import MovieDetailsModal from './components/MovieDetailsModal'
 import MovieDetailsPage from './components/MovieDetailsPage'
+import SeenPage from './components/SeenPage'
 
 function RouterWrapper() {
 	const location = useLocation()
@@ -25,6 +26,7 @@ function RouterWrapper() {
 				<Route path="/" element={<App />} />
 				<Route path="/search" element={<MovieSearchResults />} />
 				<Route path="/movie/:id" element={<MovieDetailsPage />} />
+				<Route path="/seen" element={<SeenPage />} />
 			</Routes>
 
 			{background && (

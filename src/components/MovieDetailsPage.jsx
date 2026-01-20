@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { Container, Title, Text, Image, Group, Badge, Loader, Stack, ActionIcon } from '@mantine/core'
+import { Container, Title, Text, Group, Badge, Loader, Stack, ActionIcon, Skeleton } from '@mantine/core'
 import { IconChevronLeft } from '@tabler/icons-react'
 import { getMovieDetails } from '../api/tmdb'
 
@@ -44,7 +44,9 @@ export default function MovieDetailsPage() {
       {data && (
         <Stack spacing="sm">
           <Group align="flex-start">
-            <Image src={data.poster_path ? `https://image.tmdb.org/t/p/w300${data.poster_path}` : 'https://via.placeholder.com/150x225?text=No+Image'} alt={data.title} width={150} />
+            <Skeleton visible={false} radius="6px">
+              <img src={data.poster_path ? `https://image.tmdb.org/t/p/w300${data.poster_path}` : 'https://via.placeholder.com/150x225?text=No+Image'} alt={data.title} loading="lazy" style={{width:150,height:'auto',display:'block',borderRadius:6}} />
+            </Skeleton>
             <div>
               <Title order={4}>{data.title} ({data.release_date ? new Date(data.release_date).getFullYear() : ''})</Title>
               <Text size="sm" color="dimmed">Runtime: {data.runtime ? `${data.runtime} min` : 'N/A'}</Text>

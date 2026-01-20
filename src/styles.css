@@ -5,14 +5,14 @@
 	--text: #e6eef6; /* soft white text */
 	--muted: #97a2b2; /* muted text */
 	/* card surface slightly lighter than page for subtle separation */
-	--card-bg: linear-gradient(180deg,#0f1724,#0b1220);
-	--card-border: rgba(79,70,229,0.06);
-	--card-elevation: rgba(2,6,23,0.6);
+	--card-bg: linear-gradient(180deg,#151b2b,#0c1722); /* a bit lighter for better contrast */
+	--card-border: rgba(79,70,229,0.16); /* stronger border for contrast */
+	--card-elevation: rgba(2,6,23,0.45);
 
 	/* card sizing variables */
-	--card-width: 240px;
-	--card-height: 430px;
-	--poster-height: 310px;
+	--card-width: 260px;
+	--card-height: 410px;
+	--poster-height: 345px;
 
 	/* spacing variables */
 	--card-gap: 40px;
@@ -59,7 +59,7 @@ main{display:flex;gap:1rem;padding:1rem}
 /* Main movie card (BEM) - grid-based for predictable layout */
 .movie-card{
 	background:var(--card-bg);
-	border:1px solid var(--card-border);
+	border: none; /* removed outline per request */
 	box-shadow:0 18px 48px var(--card-elevation);
 	display:grid;
 	/* ensure poster / title / overview / footer each get their own row
@@ -120,7 +120,11 @@ main{display:flex;gap:1rem;padding:1rem}
 	height:calc(1.05rem * 3);
 }
 
-/* overlay removed — hover overlay reverted */
+.movie-card__title{
+	font-size: .9	rem;
+	height:20px;
+	padding:0px;
+}
 
 /* make footer height consistent so the year baseline lines up */
 .movie-card__footer{display:flex;flex-direction:column;align-items:center;padding-bottom:6px}
@@ -172,6 +176,13 @@ main{display:flex;gap:1rem;padding:1rem}
 .rating .on{color:gold}
 .list-creator input,.list-creator textarea{width:100%;margin-bottom:8px;padding:6px}
 .movie-list-card{background:var(--card-bg);padding:8px;border-radius:6px;margin-bottom:8px}
+.rating-badges{display:flex;gap:8px;margin-top:20px}
+.rating-badge{background:rgba(0,0,0,0.28);
+	font-size: .6rem;
+	padding:6px 8px;border-radius:8px;
+	font-weight:600;font-size:0.85rem;
+	color:var(--text);
+	border:1px solid rgba(255,255,255,0.04)}
 
 /* toolbar autocomplete dropdown */
 .toolbar-autocomplete{
@@ -196,12 +207,12 @@ main{display:flex;gap:1rem;padding:1rem}
 
 .mantine-Overlay-root,
 [data-mantine-overlay] {
-  outline: 3px solid rgba(255,0,0,0.8) !important;
-  background: rgba(0,0,0,0.35) !important;
-  pointer-events: auto !important;
-  position: fixed !important;
-  inset: 0 !important;
-  z-index: 999999 !important;
+  background: rgba(0,0,0,0.35);
+  pointer-events: auto;
+  position: fixed;
+  inset: 0;
+  z-index: 999999;
+  
 }
 
 [role="dialog"]{
@@ -211,20 +222,21 @@ main{display:flex;gap:1rem;padding:1rem}
 	transform:translate(-50%,-50%) ;
 	z-index:200000 ;
 	max-width:calc(100% - 48px);
+	
 }
-/* removed close button override to allow Mantine closeButtonProps to control sizing */
 
 /* Explicit modal panel styling to ensure background color is applied */
 .movie-modal{
 	background-color: rgba(11,18,32,0.98) ;
 	color: var(--text);
-	box-shadow: 0 30px 80px rgba(2,6,23,0.9);
-		position:fixed;
+	box-shadow: 0 40px 120px rgba(2,6,23,0.92), 0 12px 40px rgba(0,0,0,0.55), 0 0 60px rgba(79,70,229,0.06);
+	position:fixed;
 	top:50% ;
 	left:50% ;
 	transform:translate(-50%,-50%) ;
 	z-index:200000 ;
 	max-width:calc(100% - 48px);
+
 }
 
 /* Ensure header and body have opaque backgrounds too */
@@ -250,7 +262,34 @@ main{display:flex;gap:1rem;padding:1rem}
 	z-index: 199999 !important;
 }
 
+/* Provider navbar styles */
+.provider-nav{width:100%;padding:6px 8px;margin-top:8px;margin-bottom:8px;display:flex;align-items:center;flex-wrap:wrap;overflow:visible}
+.provider-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.provider-btn{cursor:pointer;align-items:center;gap:8px;padding:6px 6px;border-radius:20px;min-width:84px;max-width:220px;text-transform:none;font-size:13px;font-weight:600;box-shadow:0 6px 20px rgba(2,6,23,0.35);transition:transform 140ms ease, box-shadow 140ms ease, background 120ms ease, color 120ms ease}
 
 
-JSON (JavaScript Oobject Notation)
-	lightweight data format that uses javscript object syntax to represent data 
+/* Filled (selected) appearance */
+.provider-btn.mantine-Button-filled{background:linear-gradient(180deg,var(--accent), #3b32c9);color:#fff;border:1px solid rgba(255,255,255,0.06);box-shadow:0 10px 30px rgba(79,70,229,0.18)}
+/* Subtle (unselected) appearance */
+.provider-btn.mantine-Button-subtle{background:transparent;color:var(--text);border:1px solid rgba(255,255,255,0.04)}
+.provider-btn.mantine-Button-subtle:hover{background:rgba(79,70,229,0.06)}
+
+/* focus-visible accessibility */
+.provider-btn:focus-visible{outline:2px solid rgba(79,70,229,0.18);outline-offset:2px}
+
+/* responsive tweaks */
+@media (max-width: 640px){
+  .provider-btn{min-width:68px;font-size:12px;padding:6px 8px}
+  .provider-row{gap:6px}
+}
+
+/* hide native scrollbars for cleaner look while still scrollable */
+.provider-nav::-webkit-scrollbar{display:none}
+
+/* toolbar provider layout */
+.toolbar-providers{margin-top:10px}
+.provider-bullet{width:20px;height:20px;border-radius:50%;background:linear-gradient(180deg,rgba(255,255,255,0.04),rgba(0,0,0,0.06));border:1px solid rgba(255,255,255,0.03)}
+.provider-btn .provider-name{font-size:13px}
+
+
+

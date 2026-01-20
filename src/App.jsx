@@ -2,10 +2,13 @@
 import MovieList from './components/MovieList'
 import MovieRow from './components/MovieRow'
 import MovieDetailsModal from './components/MovieDetailsModal'
-import { Container, Grid, Title, Paper, Stack, Button, Center, Loader, Text, TextInput, Group } from '@mantine/core'
-import { IconSearch } from '@tabler/icons-react'
+import { Container, Grid, Title, Paper, Stack, Center, Loader, Text, Group, Avatar, Button } from '@mantine/core'
+import ThemedButton from './components/ThemedButton'
+import ProviderNav from './components/ProviderNav'
+import SearchBar from './components/SearchBar'
 import { useNavigate, useLocation } from 'react-router-dom'
-import { getPopular, getTopRated, getTrending, searchMovies } from './api/tmdb'
+import { getPopular, getTopRated, getTrending, searchMovies, getProvidersList, getMoviesByProvider } from './api/tmdb'
+import providersFallback from './data/providersFallback'
 
 export default function App() {
   const TMDB_KEY = import.meta.env.VITE_TMDB_KEY
@@ -30,10 +33,16 @@ export default function App() {
   const [topRated, setTopRated] = useState([])
   const [trending, setTrending] = useState([])
   const [error, setError] = useState(null)
-  const [search, setSearch] = useState('')
-  const [suggestions, setSuggestions] = useState([])
-  const [loadingSuggestions, setLoadingSuggestions] = useState(false)
-  const [showSuggestions, setShowSuggestions] = useState(false)
+  
+  const [providers, setProviders] = useState([])
+  // default to Netflix (provider_id 8) as initial selection
+  const [selectedProvider, setSelectedProvider] = useState(8)
+  const [providerMovies, setProviderMovies] = useState([])
+  const [providerPage, setProviderPage] = useState(1)
+  const [providerTotalPages, setProviderTotalPages] = useState(1)
+  const [providerLoading, setProviderLoading] = useState(false)
+  const [providerHasMore, setProviderHasMore] = useState(false)
+  const [providersLoading, setProvidersLoading] = useState(false)
   const navigate = useNavigate()
   const location = useLocation()
 
@@ -42,36 +51,10 @@ export default function App() {
     navigate(`/search?q=${encodeURIComponent(query.trim())}`)
   }
   
-
   useEffect(() => { localStorage.setItem('movie_lists', JSON.stringify(lists)) }, [lists])
   useEffect(() => { localStorage.setItem('movie_ratings', JSON.stringify(ratings)) }, [ratings])
 
-  // Debounced autocomplete for toolbar search
-  useEffect(() => {
-    if (!search || search.trim().length < 2) {
-      setSuggestions([])
-      setLoadingSuggestions(false)
-      return
-    }
-
-    setLoadingSuggestions(true)
-    const t = setTimeout(async () => {
-      try {
-        const json = await searchMovies(search.trim(), 1)
-        const mapped = mapResults(json.results || []).slice(0, 8)
-        setSuggestions(mapped)
-        setShowSuggestions(true)
-      } catch (err) {
-        console.warn('Autocomplete search failed', err)
-        setSuggestions([])
-      } finally {
-        setLoadingSuggestions(false)
-      }
-    }, 300)
-
-    return () => clearTimeout(t)
-  }, [search])
-
+  
   const addList = (list) => setLists(prev => [...prev, { ...list, id: Date.now() }])
   const addToList = (listId, movieId) => setLists(prev => prev.map(l => l.id === listId ? { ...l, movies: Array.from(new Set([...(l.movies||[]), movieId])) } : l))
   const setMovieRating = (movieId, score) => setRatings(prev => ({ ...prev, [movieId]: score }))
@@ -84,8 +67,81 @@ export default function App() {
     loadPage(1)
     loadTopRated()
     loadTrending()
+    // load providers list for navbar
+    ;(async () => {
+      setProvidersLoading(true)
+      try {
+        const list = await getProvidersList()
+        console.debug('providers list fetched', list?.length)
+        // sort by display_priority if present, otherwise by name
+        list.sort((a,b) => (a.display_priority || 9999) - (b.display_priority || 9999) || a.provider_name.localeCompare(b.provider_name))
+        // attach computed logo_url when logo_path present
+        const normalized = (list || []).map(p => ({ ...p, logo_url: p.logo_path ? `https://image.tmdb.org/t/p/w92${p.logo_path}` : undefined }))
+        if (!normalized || normalized.length === 0) {
+          // fall back to bundled popular providers for development
+          console.debug('Using fallback provider list')
+          setProviders(providersFallback.map(p => ({ ...p })))
+        } else {
+          setProviders(normalized)
+        }
+      } catch (err) {
+        console.warn('Failed loading providers list', err)
+        setProviders(providersFallback.map(p => ({ ...p })))
+      } finally {
+        setProvidersLoading(false)
+      }
+    })()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+
+  // When provider selection changes, load provider movies
+  useEffect(() => {
+    if (!selectedProvider) {
+      setProviderMovies([])
+      setProviderPage(1)
+      setProviderTotalPages(1)
+      setProviderHasMore(false)
+      return
+    }
+
+    const load = async () => {
+      setProviderLoading(true)
+      try {
+        const json = await getMoviesByProvider(selectedProvider, 'US', 1)
+        const mapped = mapResults(json.results || [])
+        setProviderMovies(mapped)
+        setProviderPage(1)
+        setProviderTotalPages(json.total_pages || 1)
+        setProviderHasMore(1 < (json.total_pages || 1))
+      } catch (err) {
+        console.warn('Failed loading provider movies', err)
+        setProviderMovies([])
+        setProviderHasMore(false)
+      } finally {
+        setProviderLoading(false)
+      }
+    }
+
+    load()
+  }, [selectedProvider])
+
+  async function loadMoreProviderMovies() {
+    if (!selectedProvider || providerLoading || !providerHasMore) return
+    const next = providerPage + 1
+    setProviderLoading(true)
+    try {
+      const json = await getMoviesByProvider(selectedProvider, 'US', next)
+      const mapped = mapResults(json.results || [])
+      setProviderMovies(prev => [...prev, ...mapped])
+      setProviderPage(next)
+      setProviderTotalPages(json.total_pages || 1)
+      setProviderHasMore(next < (json.total_pages || 1))
+    } catch (err) {
+      console.warn('Failed loading more provider movies', err)
+    } finally {
+      setProviderLoading(false)
+    }
+  }
 
   function mapResults(results) {
     return (results||[]).map(m => ({
@@ -188,45 +244,41 @@ export default function App() {
   return (
     <Container size="xl" py="md">
       <Stack spacing="sm">
-        <Title order={1} style={{color:"var(--accent)",margin:"2% 3%" }}>moveez</Title>
+        <Title order={1} style={{color:"var(--accent)",margin:"2% 3%" }}>Moveez</Title>
         <Paper padding="md">
-          <div className="toolbar" style={{justifyContent: 'right', display:'flex'}}>
+          <div className="toolbar" style={{ display:'flex', width:'100%' }}>
             {error &&   <div style={{display:'flex',alignItems:'center',gap:8}}>
               <Text color="red">Error loading from TMDB: {error}</Text>
             </div>}
-              <div style={{position:'relative'}}>
-              
-                <TextInput
-                  className="toolbar-search"
-                  placeholder="Search movies..."
-                  value={search}
-                  onChange={(e) => setSearch(e.currentTarget.value)}
-                  onKeyDown={(e) => { if (e.key === 'Enter') handleSearchSubmit(search) }}
-                  onFocus={() => { if (suggestions.length) setShowSuggestions(true) }}
-                  onBlur={() => setTimeout(() => setShowSuggestions(false), 150)}
-                  rightSection={<IconSearch size={16} />}
-                />
 
-                {showSuggestions && suggestions.length > 0 && (
-                  <div className="toolbar-autocomplete" role="listbox">
-                    {suggestions.map(s => (
-                      <div key={s.id} className="toolbar-autocomplete-item" onMouseDown={() => { handleSearchSubmit(s.title); setShowSuggestions(false) }}>
-                        <img src={s.poster} alt="" className="toolbar-autocomplete-poster" />
-                        <div className="toolbar-autocomplete-meta">
-                          <div className="toolbar-autocomplete-title">{s.title}</div>
-                          <div className="toolbar-autocomplete-year">{s.year}</div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
+            <div style={{display:'flex', alignItems:'center', width:'100%', gap:12}}>
+              <ProviderNav providers={providers} providersLoading={providersLoading} selectedProvider={selectedProvider} setSelectedProvider={setSelectedProvider} />
+
+              <SearchBar onSubmit={handleSearchSubmit} />
+
+              <div style={{ marginLeft: 'auto' }}>
+                <Button variant="subtle" onClick={() => navigate('/seen')}>
+                  Seen
+                </Button>
               </div>
-           
-          </div>
+            </div>
 
-          <MovieRow title="Trending" movies={trending} onOpenDetails={(id) => navigate(`/movie/${id}`, { state: { background: location } })} onLoadMore={handleLoadMoreTrending} loading={loadingTrending} hasMore={trendingHasMore} />
-          <MovieRow title="Top Rated" movies={topRated} onOpenDetails={(id) => navigate(`/movie/${id}`, { state: { background: location } })} onLoadMore={handleLoadMoreTopRated} loading={loadingTopRated} hasMore={topRatedHasMore} />
-          <MovieRow id="row-popular" title="Popular" movies={movies} onOpenDetails={(id) => navigate(`/movie/${id}`, { state: { background: location } })} onLoadMore={handleLoadMoreAndScroll} loading={loading} hasMore={hasMore} />
+                </div>
+
+                {selectedProvider ? (
+            <div>
+              <Title order={3} style={{marginBottom:8}}>{`Popular on ${providers.find(p => p.provider_id === selectedProvider)?.provider_name || ''}`}</Title>
+              <MovieList movies={providerMovies} ratings={ratings} onRate={setMovieRating} onAddToList={addToList} lists={lists} onOpenDetails={(id) => navigate(`/movie/${id}`, { state: { background: location } })} />
+              {providerLoading && <Center style={{padding:12}}><Loader /></Center>}
+              {!providerLoading && providerHasMore && <div className="center-load-more"><ThemedButton variant="load" onClick={loadMoreProviderMovies}>Load more</ThemedButton></div>}
+            </div>
+          ) : (
+            <>
+              <MovieRow title="Trending" movies={trending} onOpenDetails={(id) => navigate(`/movie/${id}`, { state: { background: location } })} onLoadMore={handleLoadMoreTrending} loading={loadingTrending} hasMore={trendingHasMore} />
+              <MovieRow title="Top Rated" movies={topRated} onOpenDetails={(id) => navigate(`/movie/${id}`, { state: { background: location } })} onLoadMore={handleLoadMoreTopRated} loading={loadingTopRated} hasMore={topRatedHasMore} />
+              <MovieRow id="row-popular" title="Popular" movies={movies} onOpenDetails={(id) => navigate(`/movie/${id}`, { state: { background: location } })} onLoadMore={handleLoadMoreAndScroll} loading={loading} hasMore={hasMore} />
+            </>
+          )}
 
           <div className="toolbar" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
             {!TMDB_KEY ? (
@@ -238,7 +290,10 @@ export default function App() {
             )}
           </div>
 
+          
+
           {/* Movie details handled via modal route in router */}
+          
         </Paper>
       </Stack>
     </Container>

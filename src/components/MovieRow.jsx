@@ -1,7 +1,8 @@
 import React, { useRef, useEffect, useState, useCallback } from 'react'
-import { Title, ActionIcon, Loader } from '@mantine/core'
+import { Title, Loader, ActionIcon } from '@mantine/core'
 import MovieCard from './MovieCard'
 import { IconChevronLeft, IconChevronRight, IconPlus } from '@tabler/icons-react'
+import ThemedButton from './ThemedButton'
 export default function MovieRow({ id, title, movies, onOpenDetails, onLoadMore, loading, hasMore }) {
   const rowRef = useRef(null)
   const [canScrollNext, setCanScrollNext] = useState(false)
@@ -86,9 +87,9 @@ export default function MovieRow({ id, title, movies, onOpenDetails, onLoadMore,
         {onLoadMore && hasMore && (
           <div className="movie-row-item">
             <div className="load-more-item">
-              <ActionIcon size="xl" variant="filled" color="gray" onClick={onLoadMore} aria-label="Load more movies">
-                {loading ? <Loader size="sm" /> : <IconPlus size={20} />}
-              </ActionIcon>
+              <ThemedButton variant="load" onClick={onLoadMore} aria-label="Load more movies">
+                {loading ? <Loader size={14} /> : <IconPlus size={18} />}
+              </ThemedButton>
             </div>
           </div>
         )}

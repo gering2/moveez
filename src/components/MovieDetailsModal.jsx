@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { Modal, Title, Text, Image, Group, Badge, Loader, Stack } from '@mantine/core'
+import { Modal, Title, Text, Group, Badge, Loader, Stack, Skeleton } from '@mantine/core'
 import { useModalState } from '../contexts/ModalContext'
 import { getMovieDetails } from '../api/tmdb'
 
@@ -9,8 +9,6 @@ export default function MovieDetailsModal({ id, opened, onClose }) {
   const [error, setError] = useState(null)
 
   useEffect(() => {
-    // debug
-    // eslint-disable-next-line no-console
     console.log('MovieDetailsModal effect', { opened, id })
     if (!opened || !id) return
     const key = import.meta.env.VITE_TMDB_KEY
@@ -26,7 +24,6 @@ export default function MovieDetailsModal({ id, opened, onClose }) {
         const json = await getMovieDetails(id)
         if (!cancelled) {
           setData(json)
-          // eslint-disable-next-line no-console
           console.log('MovieDetailsModal got data', { id, title: json.title })
         }
       } catch (err) {
@@ -62,12 +59,12 @@ export default function MovieDetailsModal({ id, opened, onClose }) {
      
       closeButtonProps={{
         'aria-label': 'Close movie details',
-        style: { cursor: 'pointer', width: '28px', height: '28px', padding: '6px', minWidth: '28px', minHeight: '28px'  }
+        style: { border:"none",backgroundColor:"transparent",color:"white",cursor: 'pointer', width: '40px', height: '40px', padding: '6px', minWidth: '28px', minHeight: '28px'  }
       }}
       zIndex={99999}
       overlayProps={{ opacity: 0.65, blur: 6 }}
       classNames={{ modal: 'movie-modal', body: 'movie-modal-body', header: 'movie-modal-header' }}
-      styles={{ modal: { border: '1px solid rgba(255,255,255,0.08)' } }}
+      styles={{ modal: { borderRadius:"30",border: '1px solid rgba(255,255,255,0.08)' } }}
     >
       {loading && <Loader />}
       {error && <Text color="red">{error}</Text>}
@@ -75,7 +72,9 @@ export default function MovieDetailsModal({ id, opened, onClose }) {
         <Stack spacing="md">
           <Group align="flex-start">
             <Stack spacing="md">
-              <Image src={data.poster_path ? `https://image.tmdb.org/t/p/w300${data.poster_path}` : 'https://via.placeholder.com/150x225?text=No+Image'} alt={data.title} width={150} />
+              <Skeleton visible={false} radius="6px">
+                <img src={data.poster_path ? `https://image.tmdb.org/t/p/w300${data.poster_path}` : 'https://via.placeholder.com/150x225?text=No+Image'} alt={data.title} loading="lazy" style={{width:150,height:'auto',display:'block',borderRadius:6}} />
+              </Skeleton>
               <Title  order={4} style={{marginTop: 5,marginBottom:0}}>{data.title} ({data.release_date ? new Date(data.release_date).getFullYear() : ''})</Title>
             </Stack>
 

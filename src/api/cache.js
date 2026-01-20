@@ -9,7 +9,16 @@ async function requestUrl(url, { ttl = DEFAULT_TTL, force = false } = {}) {
   }
 
   const res = await fetch(url)
-  if (!res.ok) throw new Error(`TMDB error ${res.status}`)
+  if (!res.ok) {
+    let bodyText = res.statusText
+    try {
+      const jsonErr = await res.json()
+      bodyText = jsonErr?.status_message || JSON.stringify(jsonErr)
+    } catch (e) {
+      try { bodyText = await res.text() } catch (e2) { /* ignore */ }
+    }
+    throw new Error(`TMDB error ${res.status}: ${bodyText}`)
+  }
   const json = await res.json()
   cache.set(url, { expires: Date.now() + ttl, data: json })
   return json

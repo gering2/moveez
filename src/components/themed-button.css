@@ -1,0 +1,73 @@
+.themed-btn{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  padding:8px 12px;
+  border-radius:18px;
+  font-weight:600;
+  font-size:0.95rem;
+  color:var(--text);
+  background:transparent;
+  border:1px solid rgba(255,255,255,0.04);
+  cursor:pointer;
+  transition:transform 120ms ease, box-shadow 120ms ease, background-color 120ms ease, color 120ms ease;
+  will-change:transform;
+}
+
+.themed-btn--provider{
+  background: linear-gradient(180deg, #7c3aed, #6d28d9);
+  color: #fff;
+  border: 1px solid rgba(0,0,0,0.12);
+  box-shadow: 0 8px 26px rgba(109,40,217,0.16);
+}
+.themed-btn--provider:hover{background: linear-gradient(180deg, #6d28d9, #5b21b6);}
+
+.themed-btn--load{
+  background: linear-gradient(180deg, #5b21b6, #4c1d99);
+  color: #fff;
+  border: 1px solid rgba(0,0,0,0.12);
+  box-shadow: 0 8px 26px rgba(76,29,153,0.14);
+}
+.themed-btn--load:hover{background: linear-gradient(180deg, #4c1d99, #3b146f);}
+
+.themed-btn--sm{padding:6px 10px;font-size:0.85rem;border-radius:14px}
+.themed-btn--md{padding:8px 12px;font-size:0.95rem}
+.themed-btn--lg{padding:10px 14px;font-size:1.05rem}
+
+.themed-btn:focus{outline:2px solid rgba(124,58,237,0.18);outline-offset:2px}
+.themed-btn:active{transform:scale(0.98)}
+
+.themed-btn__icon{display:inline-flex;align-items:center;justify-content:center}
+.themed-btn__icon--left{margin-right:6px}
+.themed-btn__icon--right{margin-left:6px}
+
+/* helper to center load-more horizontally */
+.center-load-more{display:flex;justify-content:center;padding:12px}
+
+/* Disabled appearance for buttons */
+.themed-btn:disabled,
+.themed-btn[aria-disabled="true"]{
+  opacity:0.88;
+  cursor:not-allowed;
+  box-shadow:0 6px 18px rgba(0,0,0,0.06);
+  transform:none;
+  filter:none;
+}
+
+/* Specifically style provider variant when disabled to be more muted */
+.themed-btn--provider:disabled,
+.themed-btn--provider[aria-disabled="true"]{
+  background: linear-gradient(180deg, rgba(124,58,237,0.30), rgba(109,40,217,0.22));
+  color: #fff;
+  border: 1px solid rgba(255,255,255,0.04);
+  box-shadow: 0 6px 18px rgba(109,40,217,0.08);
+}
+
+/* Ensure provider-btn class reflects disabled state for additional specificity */
+.provider-btn[disabled]{
+  pointer-events:none;
+}
+
+/* Avoid hover styles showing on disabled buttons */
+.themed-btn:disabled:hover{background:inherit}
