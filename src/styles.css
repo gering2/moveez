@@ -37,6 +37,21 @@ main{display:flex;gap:1rem;padding:1rem}
 	position:relative; /* ensure autocomplete dropdown can layer above rows */
 	z-index:80;
 }
+
+/* Top navigation bar (site title, providers, search, seen) */
+.top-nav{
+  width:100%;
+  display:flex;
+  align-items:center;
+  gap:12px;
+  padding:8px 6px;
+  border-radius:10px;
+  background:linear-gradient(180deg, rgba(79,70,229,0.04), rgba(11,18,32,0.02));
+  border:1px solid rgba(79,70,229,0.08);
+}
+.top-nav .site-title .mantine-Title-root{font-weight:800}
+.top-nav .provider-nav{margin-top:0;margin-bottom:0}
+.top-nav .toolbar-search input{width:240px}
 .toolbar .mantine-Title-root{color:var(--text)}
 .toolbar .toolbar-note{color:var(--muted);font-size:0.95rem}
 

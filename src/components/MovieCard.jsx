@@ -11,8 +11,6 @@ export default function MovieCard({ movie, onOpen, showSeenToggle = true }) {
   const [ratings, setRatings] = React.useState(null)
   const [seen, setSeen] = React.useState(() => isSeen(movie?.id))
   function handleOpen(e) {
-    // log click for debugging modal/navigation
-    // eslint-disable-next-line no-console
     console.log('MovieCard clicked', movie?.id, movie?.title)
     // respect global modal state
     try {
@@ -38,12 +36,9 @@ export default function MovieCard({ movie, onOpen, showSeenToggle = true }) {
         try {
           const details = await getMovieDetails(movie.id)
           const imdb = details?.external_ids?.imdb_id
-          // debug: log external imdb id when present
-          // eslint-disable-next-line no-console
           console.debug('MovieCard:getMovieDetails', movie.id, movie.title, { imdb })
           if (imdb) {
             r = await fetchByImdbID(imdb)
-            // eslint-disable-next-line no-console
             console.debug('MovieCard:OMDb by imdbID result', movie.title, imdb, !!r)
           }
         } catch (e) {
@@ -51,13 +46,10 @@ export default function MovieCard({ movie, onOpen, showSeenToggle = true }) {
         }
         if (!r) {
           r = await fetchRatings(movie.title, movie.year)
-          // eslint-disable-next-line no-console
           console.debug('MovieCard:OMDb by title result', movie.title, movie.year, !!r)
         }
         if (mounted) setRatings(r)
         if (!r) {
-          // final debug: indicate missing ratings for this card
-          // eslint-disable-next-line no-console
           console.warn('MovieCard: Ratings missing for', movie.title, movie.year, 'tmdbId:', movie.id)
         }
       } catch (e) {
@@ -77,9 +69,19 @@ export default function MovieCard({ movie, onOpen, showSeenToggle = true }) {
                 <div style={{position:'relative'}}>
                   <img src={movie.poster} alt={movie.title} loading="lazy" onLoad={() => setImgLoading(false)} style={{width:'100%',height:'100%',objectFit:'cover',display:'block'}} />
                   {showSeenToggle ? (
-                    <div style={{position:'absolute', right:6, top:6, pointerEvents: modalOpen ? 'none' : 'auto'}}>
-                      <ActionIcon variant="filled" color={seen ? 'green' : 'gray'} onClick={(e) => { e.stopPropagation(); toggleSeen(movie); setSeen(prev => !prev) }} title={seen ? 'Mark as unseen' : 'Mark as seen'}>
-                        {seen ? <IconEye size={16} /> : <IconEyeOff size={16} />}
+                    <div style={{position:'absolute', right:0, top:0, pointerEvents: modalOpen ? 'none' : 'auto'}}>
+                      <ActionIcon
+                        variant="filled"
+                        color={seen ? 'green' : 'gray'}
+                        onClick={(e) => { e.stopPropagation(); toggleSeen(movie); setSeen(prev => !prev) }}
+                        title={seen ? 'Mark as unseen' : 'Mark as seen'}
+                        style={{
+                          backgroundColor: seen ? 'rgba(34,197,94,0.85)' : 'rgba(107,114,128,0.75)',
+                          color: '#fff',
+                          transition: 'background-color 120ms ease, opacity 120ms ease'
+                        }}
+                      >
+                        {seen ? <IconEye size={16} color="#fff" /> : <IconEyeOff size={16} color="#fff" />}
                       </ActionIcon>
                     </div>
                   ) : null}

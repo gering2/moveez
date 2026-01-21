@@ -4,8 +4,7 @@ import MovieRow from './components/MovieRow'
 import MovieDetailsModal from './components/MovieDetailsModal'
 import { Container, Grid, Title, Paper, Stack, Center, Loader, Text, Group, Avatar, Button } from '@mantine/core'
 import ThemedButton from './components/ThemedButton'
-import ProviderNav from './components/ProviderNav'
-import SearchBar from './components/SearchBar'
+import TopNav from './components/TopNav'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { getPopular, getTopRated, getTrending, searchMovies, getProvidersList, getMoviesByProvider } from './api/tmdb'
 import providersFallback from './data/providersFallback'
@@ -244,26 +243,9 @@ export default function App() {
   return (
     <Container size="xl" py="md">
       <Stack spacing="sm">
-        <Title order={1} style={{color:"var(--accent)",margin:"2% 3%" }}>Moveez</Title>
         <Paper padding="md">
-          <div className="toolbar" style={{ display:'flex', width:'100%' }}>
-            {error &&   <div style={{display:'flex',alignItems:'center',gap:8}}>
-              <Text color="red">Error loading from TMDB: {error}</Text>
-            </div>}
-
-            <div style={{display:'flex', alignItems:'center', width:'100%', gap:12}}>
-              <ProviderNav providers={providers} providersLoading={providersLoading} selectedProvider={selectedProvider} setSelectedProvider={setSelectedProvider} />
-
-              <SearchBar onSubmit={handleSearchSubmit} />
-
-              <div style={{ marginLeft: 'auto' }}>
-                <Button variant="subtle" onClick={() => navigate('/seen')}>
-                  Seen
-                </Button>
-              </div>
-            </div>
-
-                </div>
+          {error && <div style={{display:'flex',alignItems:'center',gap:8, marginBottom:8}}><Text color="red">Error loading from TMDB: {error}</Text></div>}
+          <TopNav providers={providers} providersLoading={providersLoading} selectedProvider={selectedProvider} setSelectedProvider={setSelectedProvider} onSearchSubmit={handleSearchSubmit} />
 
                 {selectedProvider ? (
             <div>
@@ -280,15 +262,7 @@ export default function App() {
             </>
           )}
 
-          <div className="toolbar" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            {!TMDB_KEY ? (
-              <Text color="red">TMDB API key not set — add VITE_TMDB_KEY to .env</Text>
-            ) : (
-              <>
-                <Text className="toolbar-note">Showing {movies.length} movies — page {page}/{popularTotalPages}</Text>
-              </>
-            )}
-          </div>
+          {/* bottom toolbar removed */}
 
           
 

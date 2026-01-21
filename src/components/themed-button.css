@@ -43,7 +43,7 @@
 .themed-btn__icon--right{margin-left:6px}
 
 /* helper to center load-more horizontally */
-.center-load-more{display:flex;justify-content:center;padding:12px}
+.center-load-more{display:flex;justify-content:center;padding:12px;margin-top:4rem}
 
 /* Disabled appearance for buttons */
 .themed-btn:disabled,

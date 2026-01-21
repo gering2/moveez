@@ -4,8 +4,8 @@ import { Avatar, Loader, Text } from '@mantine/core'
 
 export default function ProviderNav({ providers, providersLoading, selectedProvider, setSelectedProvider }) {
   return (
-    <div style={{flex:1, minWidth:0}}>
-      <div className="provider-nav" style={{width:'100%'}}>
+    <div style={{flex:'0 1 auto', minWidth:0}}>
+      <div className="provider-nav">
         <div className="provider-row">
           {providersLoading ? (
             <ThemedButton className="provider-btn" variant="provider" disabled>
