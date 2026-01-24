@@ -86,12 +86,24 @@ export default function MovieDetailsModal({ id, opened, onClose }) {
               <Text mt="med">{data.overview}</Text>
             </Stack>
           </Group>
+          <div style={{display: "flex", flexDirection: "column", gap:2}}>
           {data.credits && data.credits.cast && (
-            <Group style={{alignItems:"center",display:"flex", gap:5}} >
-              <Title style = {{whiteSpace: "nowrap"}}order={5}>Top cast:</Title>
-              <Text style={{fontSize:10}}>{(data.credits.cast||[]).slice(0,6).map(c => c.name).join(', ')}</Text>
-            </Group>
-          )}
+            <div display="flex" style={{alignItems:"center",display:"flex",marginTop:8,marginBottom:-8}}>
+            <Title style = {{padding:0,margin:0, whiteSpace: "nowrap",marginRight:4}} order={5}>Top cast:</Title>
+              <Text style={{fontSize:12}}>{(data.credits.cast||[]).slice(0,6).map(c => c.name).join(', ')}</Text>
+              </div>)}
+                { (() => {
+            const directors = (data.credits.crew || []).filter(m => m.job === 'Director').map(d => d.name)
+            if (!directors || directors.length === 0) return null
+            return (
+              <Group style={{alignItems:"center",display:"flex", gap:5,marginTop:-8}}>
+                <Title style={{padding:0,margin:0,whiteSpace: "nowrap"}} order={5}>{directors.length > 1 ? 'Directors:' : 'Director:'}</Title>
+                <Text style={{fontSize:12}}>{directors.join(', ')}</Text>
+              </Group>
+            )
+          })()}
+     
+        </div>
         </Stack>
       )}
     </Modal>

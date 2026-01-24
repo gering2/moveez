@@ -262,11 +262,7 @@ export default function App() {
             </>
           )}
 
-          {/* bottom toolbar removed */}
 
-          
-
-          {/* Movie details handled via modal route in router */}
           
         </Paper>
       </Stack>

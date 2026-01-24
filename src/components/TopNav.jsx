@@ -9,17 +9,14 @@ export default function TopNav({ providers, providersLoading, selectedProvider, 
 
   return (
     <div className="top-nav">
-        <div className="site-title" style={{flex:'0 0 auto', cursor:'pointer'}} onClick={() => navigate('/') }>
           <Title order={2} style={{color:'var(--accent)', margin:0}}>Moveez</Title>
-        </div>
 
-        <div>
           <ProviderNav providers={providers} providersLoading={providersLoading} selectedProvider={selectedProvider} setSelectedProvider={setSelectedProvider} />
-        </div>
+                  <Button variant="subtle" onClick={() => navigate('/seen')}>Seen</Button>
 
-        <div style={{display:'flex', alignItems:'center', gap:12}}>
+        
+        <div style={{marginLeft:400}}>
           <SearchBar onSubmit={onSearchSubmit} />
-          <Button variant="subtle" onClick={() => navigate('/seen')}>Seen</Button>
         </div>
     </div>
   )

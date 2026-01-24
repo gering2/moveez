@@ -279,8 +279,27 @@ main{display:flex;gap:1rem;padding:1rem}
 
 /* Provider navbar styles */
 .provider-nav{width:100%;padding:6px 8px;margin-top:8px;margin-bottom:8px;display:flex;align-items:center;flex-wrap:wrap;overflow:visible}
-.provider-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.provider-row{display:flex;align-items:center;gap:8px;}
 .provider-btn{cursor:pointer;align-items:center;gap:8px;padding:6px 6px;border-radius:20px;min-width:84px;max-width:220px;text-transform:none;font-size:13px;font-weight:600;box-shadow:0 6px 20px rgba(2,6,23,0.35);transition:transform 140ms ease, box-shadow 140ms ease, background 120ms ease, color 120ms ease}
+
+/* provider-link: plain clickable link-style button used in TopNav */
+.provider-link{
+	align-items:center;
+	gap:8px;
+	padding:6px 8px;
+	background:transparent;
+	border:none;
+	color:var(--text);
+	cursor:pointer;
+	font-weight:600;
+	font-size:16px;
+	text-decoration:none;
+}
+.provider-link:hover{opacity:0.92}
+.provider-link{display:inline-flex;align-items:center;gap:8px;padding:6px 8px;background:transparent;border:none;color:var(--text);cursor:pointer;font-weight:600;font-size:13px;text-decoration:none;position:relative;padding-bottom:8px}
+.provider-link.active{font-weight:700;text-decoration:none}
+.provider-link.active::after{content:'';position:absolute;left:6px;right:6px;height:3px;bottom:4px;background:currentColor;border-radius:2px;opacity:0.95}
+.provider-link:disabled{opacity:0.6;cursor:not-allowed}
 
 
 /* Filled (selected) appearance */
@@ -303,7 +322,6 @@ main{display:flex;gap:1rem;padding:1rem}
 
 /* toolbar provider layout */
 .toolbar-providers{margin-top:10px}
-.provider-bullet{width:20px;height:20px;border-radius:50%;background:linear-gradient(180deg,rgba(255,255,255,0.04),rgba(0,0,0,0.06));border:1px solid rgba(255,255,255,0.03)}
 .provider-btn .provider-name{font-size:13px}
 
 
