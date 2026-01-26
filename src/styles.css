@@ -18,8 +18,7 @@
 	--card-gap: 40px;
 	--row-gap: 20px;
 
-	/* outer spacing */
-	--outer-padding: 24px;
+	
 }
 body{font-family:Inter,Segoe UI,Arial,Helvetica,sans-serif;margin:0;padding:var(--outer-padding);background:var(--bg);color:var(--text)}
 .app header{background:var(--accent);color:#fff;padding:1rem}
@@ -40,14 +39,29 @@ main{display:flex;gap:1rem;padding:1rem}
 
 /* Top navigation bar (site title, providers, search, seen) */
 .top-nav{
-  width:100%;
-  display:flex;
-  align-items:center;
-  gap:12px;
-  padding:8px 6px;
-  border-radius:10px;
-  background:linear-gradient(180deg, rgba(79,70,229,0.04), rgba(11,18,32,0.02));
-  border:1px solid rgba(79,70,229,0.08);
+	width:100%;
+	margin-top:10px;
+	margin-bottom: 40px;
+	display:flex;
+	align-items:center;
+	gap:12px;
+	border-radius:0;
+	border-bottom:2px solid rgba(255,255,255,0.03);
+	padding: 10px 0;
+	box-sizing: border-box;
+}
+
+/* Inner container to center content and add horizontal padding/gutters */
+.top-nav-inner{
+	width:100%;
+	max-width:1200px;
+	margin:0 auto;
+	padding:0 24px;
+	display:flex;
+	align-items:center;
+	justify-content:space-between;
+	gap:12px;
+	box-sizing:border-box;
 }
 .top-nav .site-title .mantine-Title-root{font-weight:800}
 .top-nav .provider-nav{margin-top:0;margin-bottom:0}
@@ -56,10 +70,10 @@ main{display:flex;gap:1rem;padding:1rem}
 .toolbar .toolbar-note{color:var(--muted);font-size:0.95rem}
 
 
-/* search box styling in toolbar */
-.toolbar-search{}
-
-.toolbar-search input{width:260px;padding:10px 12px;border-radius:10px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.04);color:var(--text);transition:box-shadow 160ms ease,border-color 120ms ease}
+.toolbar-search input{width:260px;padding:10px 12px;border-radius:10px;
+	background:rgba(255,255,255,0.02);
+	border:1px solid rgba(255,255,255,0.04);
+	color:var(--text);transition:box-shadow 160ms ease,border-color 120ms ease}
 .toolbar-search .mantine-Input-input:focus,
 .toolbar-search input:focus{outline:none;box-shadow:0 8px 30px rgba(79,70,229,0.08);border-color:var(--accent)}
 .toolbar-search .mantine-Input-icon svg{color:var(--muted)}
@@ -70,11 +84,9 @@ main{display:flex;gap:1rem;padding:1rem}
 .movie-legacy-card{background:var(--card-bg);padding:8px;border-radius:6px;box-shadow:0 1px 3px rgba(0,0,0,0.08);display:flex;gap:8px}
 .movie-legacy-card img{width:80px;height:120px;object-fit:contain;object-position:center;border-radius:4px;background:rgba(0,0,0,0.04)}
 
-/* styled Mantine Card for movie cards (centered) */
-/* Main movie card (BEM) - grid-based for predictable layout */
 .movie-card{
 	background:var(--card-bg);
-	border: none; /* removed outline per request */
+	border: none; 
 	box-shadow:0 18px 48px var(--card-elevation);
 	display:grid;
 	/* ensure poster / title / overview / footer each get their own row
@@ -107,7 +119,7 @@ main{display:flex;gap:1rem;padding:1rem}
 
 .movie-card__title{
 	font-weight:700;
-	font-size:1.0rem;
+	font-size:.9	0rem;
 	line-height:1.08;
 	overflow:hidden;
 	text-overflow:ellipsis;
@@ -139,6 +151,12 @@ main{display:flex;gap:1rem;padding:1rem}
 	font-size: .9	rem;
 	height:20px;
 	padding:0px;
+}
+
+/* smaller title variant when the title overflows two lines */
+.movie-card__title--small{
+	font-size:0.66rem;
+	line-height:1.04;
 }
 
 /* make footer height consistent so the year baseline lines up */
@@ -278,7 +296,7 @@ main{display:flex;gap:1rem;padding:1rem}
 }
 
 /* Provider navbar styles */
-.provider-nav{width:100%;padding:6px 8px;margin-top:8px;margin-bottom:8px;display:flex;align-items:center;flex-wrap:wrap;overflow:visible}
+.provider-nav{width:auto;padding:6px 8px;margin-top:8px;margin-bottom:8px;display:flex;align-items:center;flex-wrap:wrap;overflow:visible;flex:0 1 auto}
 .provider-row{display:flex;align-items:center;gap:8px;}
 .provider-btn{cursor:pointer;align-items:center;gap:8px;padding:6px 6px;border-radius:20px;min-width:84px;max-width:220px;text-transform:none;font-size:13px;font-weight:600;box-shadow:0 6px 20px rgba(2,6,23,0.35);transition:transform 140ms ease, box-shadow 140ms ease, background 120ms ease, color 120ms ease}
 
@@ -310,6 +328,11 @@ main{display:flex;gap:1rem;padding:1rem}
 
 /* focus-visible accessibility */
 .provider-btn:focus-visible{outline:2px solid rgba(79,70,229,0.18);outline-offset:2px}
+
+/* Seen button: themed pink, rounded pill */
+.seen-btn{display:inline-flex;white-space: nowrap; margin:0px 80px; align-items:center;gap:8px;padding:8px 12px;border-radius:999px;background:linear-gradient(180deg,#ff80bf,#ff4da6);color:#fff;border:1px solid rgba(255,255,255,0.06);font-weight:700;padding-right:20px;cursor:pointer;box-shadow:0 8px 20px rgba(255,77,166,0.12)}
+.seen-btn:hover{transform:translateY(-2px);box-shadow:0 14px 30px rgba(255,77,166,0.18)}
+.seen-btn:focus{outline:2px solid rgba(255,77,166,0.18);outline-offset:2px}
 
 /* responsive tweaks */
 @media (max-width: 640px){

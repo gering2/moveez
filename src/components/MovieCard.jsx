@@ -10,6 +10,8 @@ import { useModalState } from '../contexts/ModalContext'
 export default function MovieCard({ movie, onOpen, showSeenToggle = true }) {
   const [ratings, setRatings] = React.useState(null)
   const [seen, setSeen] = React.useState(() => isSeen(movie?.id))
+  const titleRef = React.useRef(null)
+  const [smallTitle, setSmallTitle] = React.useState(false)
   function handleOpen(e) {
     console.log('MovieCard clicked', movie?.id, movie?.title)
     // respect global modal state
@@ -61,6 +63,20 @@ export default function MovieCard({ movie, onOpen, showSeenToggle = true }) {
 
   React.useEffect(() => { setSeen(isSeen(movie?.id)) }, [movie?.id])
 
+  React.useEffect(() => {
+    function checkOverflow() {
+      const el = titleRef.current
+      if (!el) return
+      // If content height exceeds container height, consider it overflowing
+      const isOverflowing = el.scrollHeight > el.clientHeight + 1
+      setSmallTitle(isOverflowing)
+    }
+    // check initially and on resize
+    const t = setTimeout(checkOverflow, 50)
+    window.addEventListener('resize', checkOverflow)
+    return () => { clearTimeout(t); window.removeEventListener('resize', checkOverflow) }
+  }, [movie?.title])
+
   return (
     <Card className={"movie-card" + (modalOpen || seen ? ' disabled' : '')} shadow="sm" padding="xs" radius="md" withBorder onClick={handleOpen} role="button" tabIndex={0} onKeyDown={(e) => { if (e.key === 'Enter' && !modalOpen && !seen) onOpen && onOpen() }}>
       <Card.Section>
@@ -90,7 +106,7 @@ export default function MovieCard({ movie, onOpen, showSeenToggle = true }) {
         </div>
       </Card.Section>
       <div style = {{display:"flex",flexDirection:'column',justifyContent:"center",alignItems:"center"}}>
-        <div className="movie-card__title">{movie.title}</div>
+        <div ref={titleRef} className={"movie-card__title" + (smallTitle ? ' movie-card__title--small' : '')}>{movie.title}</div>
         <div className="rating-badges">
           {ratings?.imdbRating ? <span className="rating-badge">IMDb {ratings.imdbRating}</span> : null}
           {ratings?.metascore ? <span className="rating-badge">Metascore {ratings.metascore}</span> : null}

@@ -46,7 +46,7 @@ export default function SearchBar({ onSubmit }) {
   }
 
   return (
-    <div style={{position:'relative', flex:'0 0 auto'}}>
+    <div style={{position:'relative' }}>
       <TextInput
         className="toolbar-search"
         placeholder="Search movies..."

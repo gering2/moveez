@@ -244,12 +244,11 @@ export default function App() {
     <Container size="xl" py="md">
       <Stack spacing="sm">
         <Paper padding="md">
-          {error && <div style={{display:'flex',alignItems:'center',gap:8, marginBottom:8}}><Text color="red">Error loading from TMDB: {error}</Text></div>}
           <TopNav providers={providers} providersLoading={providersLoading} selectedProvider={selectedProvider} setSelectedProvider={setSelectedProvider} onSearchSubmit={handleSearchSubmit} />
+          {error && <div style={{display:'flex',alignItems:'center',gap:8, marginBottom:8}}><Text color="red">Error loading from TMDB: {error}</Text></div>}
 
                 {selectedProvider ? (
             <div>
-              <Title order={3} style={{marginBottom:8}}>{`Popular on ${providers.find(p => p.provider_id === selectedProvider)?.provider_name || ''}`}</Title>
               <MovieList movies={providerMovies} ratings={ratings} onRate={setMovieRating} onAddToList={addToList} lists={lists} onOpenDetails={(id) => navigate(`/movie/${id}`, { state: { background: location } })} />
               {providerLoading && <Center style={{padding:12}}><Loader /></Center>}
               {!providerLoading && providerHasMore && <div className="center-load-more"><ThemedButton variant="load" onClick={loadMoreProviderMovies}>Load more</ThemedButton></div>}
